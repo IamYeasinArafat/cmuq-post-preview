@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Template Previewer</title>
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nunjucks/3.0.1/nunjucks.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;600&family=Open+Sans:wght@300&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div id="controls">
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="basic">Basic</button>
+        <button class="tab-btn" data-tab="advanced">Advanced</button>
+    </div>
+
+    <div id="basic" class="tab-content active">
+        <div class="input-group">
+            <label>Full Name</label>
+            <input type="text" id="name" value="Yeasin Arafat Rafio">
+        </div>
+        <div class="input-group">
+            <label>Instagram Handle</label>
+            <input type="text" id="handle" value="@yeasin_arafat_rafio">
+        </div>
+        <div class="input-group">
+            <label>Major</label>
+            <input type="text" id="major" value="Biological Sciences">
+        </div>
+        <div class="input-group">
+            <label>Profile Portrait</label>
+            <label class="file-btn" for="prof_up">Upload Photo</label>
+            <input type="file" id="prof_up" accept="image/*">
+        </div>
+    </div>
+
+    <div id="advanced" class="tab-content">
+        <div class="input-group">
+            <label>Location</label>
+            <input type="text" id="location" value="Doha, Qatar">
+        </div>
+        <div class="input-group">
+            <label>Background Image</label>
+            <label class="file-btn" for="bg_up">Change Background</label>
+            <input type="file" id="bg_up" accept="image/*">
+        </div>
+        <div class="input-group">
+            <label>University Seal</label>
+            <label class="file-btn" for="seal_up">Change Seal</label>
+            <input type="file" id="seal_up" accept="image/*">
+        </div>
+    </div>
+</div>
+
+<div id="view">
+    <div id="canvas-wrapper">
+        <iframe id="preview-frame"></iframe>
+    </div>
+</div>
+
+<script id="template" type="text/template">
+    <html>
+    <head>
+        <link href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;600&family=Open+Sans:wght@300&display=swap" rel="stylesheet">
+        <style>
+            :root { --bg-red: #a31621; --white: #ffffff; }
+            * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Source Serif Pro', serif; }
+            .insta-card {
+                width: 1080px; height: 1440px;
+                background-image: url('{{ bg_image_data }}');
+                background-size: cover; background-position: center;
+                padding: 80px 60px; color: var(--white);
+                display: flex; flex-direction: column; justify-content: space-between;
+                position: relative; overflow: hidden;
+            }
+            .card-header { display: flex; justify-content: space-between; align-items: center; gap: 20px}
+            .name-block { font-size: 2.75rem; overflow: hidden;font-weight: 600; width: 60%; border: 1px solid rgba(255,255,255,0.15); padding: 15px; }
+            .handle { font-size: 2.5rem; text-align: end; width: 40%; border: 1px solid rgba(255,255,255,0.15); padding: 15px; }
+            .image-container { display: flex; flex-direction: column; align-items: center; flex-grow: 1; justify-content: center; }
+            .image-container img { width: 650px; height: 650px; object-fit: cover; border-radius: 24px; border: 5px solid white; }
+            .major { margin-top: 15px; font-family: "Open Sans"; font-size: 2.5rem; font-weight: 300; }
+            .card-footer { display: flex; justify-content: space-between; align-items: flex-end; }
+            .location { display: flex; align-items: center; gap: 15px; font-size: 2.5rem; }
+            .university-logo img { width: 225px; height: auto; }
+            .insta-card::after { content: ""; position: absolute; top: 20px; bottom: 20px; left: 20px; right: 20px; border: 5px solid rgba(255,255,255,0.4); border-radius: 10px; }
+        </style>
+    </head>
+    <body>
+        <div class="insta-card">
+            <header class="card-header">
+                <div class="name-block"><h1>{{ name }}</h1></div>
+                <div class="handle">{{ handle }}</div>
+            </header>
+            <div class="image-container">
+                <img src="{{ profile_image_data }}">
+                <p class="major">{{ major }}</p>
+            </div>
+            <footer class="card-footer">
+                <div class="location">📍 {{ location }}</div>
+                <div class="university-logo"><img src="{{ seal_image_data }}"></div>
+            </footer>
+        </div>
+    </body>
+    </html>
+</script>
+
+<script src="script.js"></script>
+</body>
+</html>

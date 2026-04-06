@@ -1,0 +1,53 @@
+:root {
+    --sidebar-bg: #1a1a1a;
+    --accent: #a31621;
+    --text-color: #ececec;
+}
+
+body {
+    margin: 0; display: flex; height: 100vh;
+    font-family: 'Inter', sans-serif; background: #121212; color: var(--text-color);
+}
+
+#controls {
+    width: 380px; background: var(--sidebar-bg);
+    border-right: 1px solid #333; display: flex; flex-direction: column;
+}
+
+.tabs { display: flex; background: #252525; border-bottom: 1px solid #333; }
+
+.tab-btn {
+    flex: 1; padding: 15px; border: none; background: none;
+    color: #888; cursor: pointer; font-size: 12px; font-weight: bold;
+}
+
+.tab-btn.active { color: #fff; border-bottom: 3px solid var(--accent); }
+
+.tab-content { padding: 25px; display: none; flex-grow: 1; overflow-y: auto; }
+.tab-content.active { display: block; }
+
+.input-group { margin-bottom: 20px; }
+label { display: block; font-size: 11px; color: #888; margin-bottom: 8px; text-transform: uppercase; }
+
+input[type="text"] {
+    width: 100%; background: #2a2a2a; border: 1px solid #444; color: #fff;
+    padding: 10px; border-radius: 6px; box-sizing: border-box;
+}
+
+.file-btn {
+    display: block; width: 100%; background: #333; border: 1px dashed #555;
+    padding: 10px; color: #aaa; text-align: center; border-radius: 6px; cursor: pointer;
+}
+
+input[type="file"] { display: none; }
+
+#view {
+    flex-grow: 1; background: #202020; display: flex; align-items: center; justify-content: center;
+}
+
+#canvas-wrapper {
+    width: 1080px; height: 1440px; transform: scale(0.4);
+    box-shadow: 0 50px 100px rgba(0,0,0,0.5);
+}
+
+iframe { width: 100%; height: 100%; border: none; background: white; }

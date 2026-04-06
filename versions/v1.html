@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Template Live Preview</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nunjucks/3.0.1/nunjucks.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;600&family=Open+Sans:wght@300&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --sidebar-bg: #1a1a1a;
+            --accent: #a31621;
+        }
+
+        body {
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background: #121212;
+            color: #ececec;
+            overflow: hidden;
+        }
+
+        /* UI Sidebar */
+        #controls {
+            width: 380px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            z-index: 10;
+        }
+
+        h2 { font-size: 20px; margin-bottom: 25px; color: #fff; border-bottom: 2px solid var(--accent); display: inline-block; padding-bottom: 5px;}
+        
+        .input-group { margin-bottom: 18px; }
+        label { display: block; font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
+        input[type="text"] {
+            width: 100%; background: #2a2a2a; border: 1px solid #444; color: white;
+            padding: 10px; border-radius: 6px; box-sizing: border-box; transition: border 0.3s;
+        }
+        input:focus { border-color: var(--accent); outline: none; }
+        
+        .file-btn {
+            display: block; width: 100%; background: #333; border: 1px dashed #555;
+            padding: 10px; color: #aaa; text-align: center; border-radius: 6px;
+            cursor: pointer; font-size: 13px;
+        }
+        .file-btn:hover { background: #3d3d3d; border-color: #777; }
+        input[type="file"] { display: none; }
+
+        /* Preview Area */
+        #view {
+            flex-grow: 1;
+            background: #252525;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            perspective: 1000px;
+        }
+
+        /* This container scales the 1080x1440 card to fit the screen */
+        #canvas-wrapper {
+            width: 1080px;
+            height: 1440px;
+            transform: scale(0.45); /* Adjust this scale if it's too big/small for your monitor */
+            transform-origin: center center;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.6);
+        }
+
+        iframe {
+            width: 1080px;
+            height: 1440px;
+            border: none;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+
+<div id="controls">
+    <h2>Card Settings</h2>
+    
+    <div class="input-group">
+        <label>Full Name</label>
+        <input type="text" id="name" value="ALEXANDRA SMITH" oninput="update()">
+    </div>
+    
+    <div class="input-group">
+        <label>Handle</label>
+        <input type="text" id="handle" value="@alexa_codes" oninput="update()">
+    </div>
+
+    <div class="input-group">
+        <label>Major</label>
+        <input type="text" id="major" value="Computer Science" oninput="update()">
+    </div>
+
+    <div class="input-group">
+        <label>Location</label>
+        <input type="text" id="location" value="New York, NY" oninput="update()">
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
+
+    <div class="input-group">
+        <label>Background Image</label>
+        <label class="file-btn" for="bg_up">Choose Image...</label>
+        <input type="file" id="bg_up" accept="image/*" onchange="handleFile(this, 'bg_image_data')">
+    </div>
+
+    <div class="input-group">
+        <label>Profile Portrait</label>
+        <label class="file-btn" for="prof_up">Choose Image...</label>
+        <input type="file" id="prof_up" accept="image/*" onchange="handleFile(this, 'profile_image_data')">
+    </div>
+
+    <div class="input-group">
+        <label>University Seal</label>
+        <label class="file-btn" for="seal_up">Choose Image...</label>
+        <input type="file" id="seal_up" accept="image/*" onchange="handleFile(this, 'seal_image_data')">
+    </div>
+</div>
+
+<div id="view">
+    <div id="canvas-wrapper">
+        <iframe id="preview-frame"></iframe>
+    </div>
+</div>
+
+<script id="template" type="text/template">
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <link href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;600&family=Open+Sans:wght@300&display=swap" rel="stylesheet">
+        <style>
+            :root { --bg-red: #a31621; --white: #ffffff; }
+            * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Source Serif Pro', serif; }
+            
+            .insta-card {
+                width: 1080px; height: 1440px;
+                background-image: url('{{ bg_image_data }}');
+                background-size: cover; background-position: center;
+                padding: 80px 60px; color: var(--white);
+                display: flex; flex-direction: column; justify-content: space-between;
+                position: relative; overflow: hidden;
+            }
+
+            .card-header { display: flex; flex-direction: row; justify-content: space-between; align-items: center; }
+            .name-block { font-size: 2.75rem; line-height: 1.1; font-weight: 600; text-transform: capitalize; width: 50%; border: 1px solid rgba(255, 255, 255, 0.15); padding: 10px; }
+            .handle { font-size: 2.5rem; font-weight: 400; text-align: end; white-space: nowrap; opacity: 0.9; width: 40%; border: 1px solid rgba(255, 255, 255, 0.15); padding: 10px; }
+            
+            .image-container { display: flex; flex-direction: column; align-items: center; gap: 20px; flex-grow: 1; justify-content: center; }
+            .image-container img { width: 650px; height: 650px; object-fit: cover; border-radius: 24px; border: 5px solid var(--white); background-color: #eee; }
+            
+            .major { margin-top: 15px; font-family: "Open Sans"; font-size: 2.5rem; font-weight: 300; }
+            .card-footer { display: flex; justify-content: space-between; align-items: flex-end; }
+            .location { display: flex; align-items: flex-start; gap: 8px; font-size: 2.5rem; font-weight: 200; }
+            
+            .university-logo img { width: 225px; height: auto; margin: -45px -20px; }
+
+            .insta-card::after {
+                content: ""; position: absolute; top: 20px; bottom: 20px; left: 20px; right: 20px;
+                border: 5px solid rgba(255, 255, 255, 0.428); pointer-events: none; border-radius: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="insta-card">
+            <header class="card-header">
+                <div class="name-block"><h1>{{ name }}</h1></div>
+                <div class="handle">{{ handle }}</div>
+            </header>
+
+            <div class="image-container">
+                <img src="{{ profile_image_data }}" alt="Profile Portrait">
+                <p class="major">{{ major }}</p>
+            </div>
+
+            <footer class="card-footer">
+                <div class="location">
+                    <svg viewBox="0 0 24 24" fill="white" width="60" height="60">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                    </svg>
+                    {{ location }}
+                </div>
+                <div class="university-logo">
+                    <img src="{{ seal_image_data }}" alt="Seal">
+                </div>
+            </footer>
+        </div>
+    </body>
+    </html>
+</script>
+
+<script>
+    let cardData = {
+        name: "ALEXANDRA SMITH",
+        handle: "@alexa_codes",
+        major: "Computer Science",
+        location: "New York, NY",
+        bg_image_data: "https://images.unsplash.com/photo-1541339907198-e087563f02b1?auto=format&fit=crop&w=1000",
+        profile_image_data: "https://via.placeholder.com/650",
+        seal_image_data: "https://via.placeholder.com/225x100?text=University+Seal"
+    };
+
+    function handleFile(input, key) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onloadend = function() {
+            cardData[key] = reader.result;
+            update();
+        }
+        if (file) reader.readAsDataURL(file);
+    }
+
+    function update() {
+        cardData.name = document.getElementById('name').value;
+        cardData.handle = document.getElementById('handle').value;
+        cardData.major = document.getElementById('major').value;
+        cardData.location = document.getElementById('location').value;
+
+        const template = document.getElementById('template').innerHTML;
+        const rendered = nunjucks.renderString(template, cardData);
+        
+        const iframe = document.getElementById('preview-frame');
+        const doc = iframe.contentDocument || iframe.contentWindow.document;
+        doc.open();
+        doc.write(rendered);
+        doc.close();
+    }
+
+    window.onload = update;
+</script>
+
+</body>
+</html>
