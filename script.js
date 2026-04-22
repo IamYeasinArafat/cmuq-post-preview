@@ -11,17 +11,14 @@ let cardData = {
 
 // --- Core Functions ---
 function updatePreview() {
-    // 1. Collect values from inputs
     cardData.name = document.getElementById('name').value;
     cardData.handle = document.getElementById('handle').value;
     cardData.major = document.getElementById('major').value;
     cardData.location = document.getElementById('location').value;
 
-    // 2. Render Template via Nunjucks
     const templateSource = document.getElementById('template').innerHTML;
     const renderedHTML = nunjucks.renderString(templateSource, cardData);
     
-    // 3. Inject into Iframe
     const iframe = document.getElementById('preview-frame');
     const doc = iframe.contentDocument || iframe.contentWindow.document;
     doc.open();
@@ -41,9 +38,51 @@ function handleFileSelect(event, dataKey) {
     reader.readAsDataURL(file);
 }
 
-// --- Event Listeners (Industry Standard) ---
+
+async function downloadImage() {
+    const exportContainer = document.getElementById('export-container');
+    const templateSource = document.getElementById('template').innerHTML;
+    
+    // 1. We wrap the template in a dummy div to parse it
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = templateSource;
+    
+    // 2. Extract the styles
+    const styles = tempDiv.querySelector('style').outerHTML;
+    // 3. Extract the card content
+    const cardContent = tempDiv.querySelector('.insta-card').outerHTML;
+    
+    // 4. Inject into export container: Styles + Rendered Template
+    const renderedCard = nunjucks.renderString(cardContent, cardData);
+    exportContainer.innerHTML = styles + renderedCard;
+    
+    // 5. Wait for images
+    const images = Array.from(exportContainer.querySelectorAll('img'));
+    await Promise.all(images.map(img => {
+        if (img.complete) return Promise.resolve();
+        return new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
+    }));
+
+    // 6. Capture
+    const node = exportContainer.querySelector('.insta-card');
+    
+    domtoimage.toJpeg(node, { width: 1080, height: 1440, quality: 1.0 })
+    .then(function (dataUrl) {
+        const link = document.createElement('a');
+        link.download = 'instagram-template.jpg';
+        link.href = dataUrl;
+        link.click();
+        exportContainer.innerHTML = ''; 
+    })
+    .catch(function (error) {
+        console.error('Download failed', error);
+    });
+}
+
+
+// --- Event Listeners ---
 document.addEventListener('DOMContentLoaded', () => {
-    // Tab Switching Logic
+    // Tab Switching
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.tab-btn, .tab-content').forEach(el => el.classList.remove('active'));
@@ -57,34 +96,14 @@ document.addEventListener('DOMContentLoaded', () => {
         input.addEventListener('input', updatePreview);
     });
 
-    // File Upload Listeners
+    // File Uploads
     document.getElementById('prof_up').addEventListener('change', (e) => handleFileSelect(e, 'profile_image_data'));
     document.getElementById('bg_up').addEventListener('change', (e) => handleFileSelect(e, 'bg_image_data'));
     document.getElementById('seal_up').addEventListener('change', (e) => handleFileSelect(e, 'seal_image_data'));
 
+    // Download Button
+    document.getElementById('download-btn').addEventListener('click', downloadImage);
+
     // Initial Run
     updatePreview();
-
-    document.getElementById('download-btn').addEventListener('click', downloadImage);
 });
-
-
-function downloadImage() {
-    const iframe = document.getElementById('preview-frame');
-    const cardElement = iframe.contentDocument.querySelector('.insta-card');
-
-    // Use html2canvas to render the specific element
-    html2canvas(cardElement, {
-        allowTaint: true,
-        useCORS: true,
-        width: 1080, // Match your card width
-        height: 1440 // Match your card height
-    }).then(canvas => {
-        // Convert to data URL and trigger download
-        const image = canvas.toDataURL("image/jpeg", 1.0);
-        const link = document.createElement('a');
-        link.download = 'instagram-card.jpg';
-        link.href = image;
-        link.click();
-    });
-}

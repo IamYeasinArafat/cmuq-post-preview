@@ -6,7 +6,7 @@
     <title>Instagram Template Previewer</title>
     
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nunjucks/3.0.1/nunjucks.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;600&family=Open+Sans:wght@300&family=Inter:wght@400;700&display=swap" rel="stylesheet">
 </head>
@@ -35,8 +35,6 @@
             <label>Profile Portrait</label>
             <label class="file-btn" for="prof_up">Upload Photo</label>
             <input type="file" id="prof_up" accept="image/*">
-
-            <button id="download-btn" class="download-btn">Download as JPG</button>
         </div>
     </div>
 
@@ -56,6 +54,10 @@
             <input type="file" id="seal_up" accept="image/*">
         </div>
     </div>
+
+    <button id="download-btn" style="margin: 20px; padding: 15px; background: #a31621; border: none; color: white; cursor: pointer; border-radius: 6px; font-weight: bold; width: calc(100% - 40px);">
+        Download JPG
+    </button>
 </div>
 
 <div id="view">
@@ -64,36 +66,44 @@
     </div>
 </div>
 
+<div id="export-container" style="position: absolute; left: -9999px; width: 1080px; height: 1440px;"></div>
+
 <script id="template" type="text/template">
     <html>
     <head>
-        <link href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;600&family=Open+Sans:wght@300&display=swap" rel="stylesheet">
         <style>
             :root { --bg-red: #a31621; --white: #ffffff; }
             * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Source Serif Pro', serif; }
+            
+            /* Add these fixes */
             .insta-card {
                 width: 1080px; height: 1440px;
-                background-image: url('{{ bg_image_data }}');
-                background-size: cover; background-position: center;
+                position: relative; /* Required for absolute background */
                 padding: 80px 40px; color: var(--white);
                 display: flex; flex-direction: column; justify-content: space-between;
-                position: relative; overflow: hidden;
+                overflow: hidden;
             }
+            .bg-img {
+                position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+                object-fit: cover; z-index: -1;
+            }
+            /* End fixes */
+
             .card-header { display: flex; justify-content: space-between; align-items: center;}
-            .name-block { font-size: 2.75rem; overflow: hidden;font-weight: 600; width: 60%; border: 0px solid rgba(255,255,255,0.15); padding: 15px; }
+            .name-block { font-size: 2.75rem; overflow: hidden; font-weight: 600; width: 60%; border: 0px solid rgba(255,255,255,0.15); padding: 15px; }
             .handle { font-size: 2.5rem; text-align: end; width: 40%; border: 0px solid rgba(255,255,255,0.15); padding: 15px; }
             .image-container { display: flex; flex-direction: column; align-items: center; flex-grow: 1; justify-content: center; }
             .image-container img { width: 650px; height: 650px; object-fit: cover; border-radius: 24px; border: 5px solid white; }
-            .major { margin-top: 15px; font-family: "Open Sans"; font-size: 2.5rem; font-weight: 300; }
+            .major { margin-top: 15px; font-family: "Open Sans", sans-serif; font-size: 2.5rem; font-weight: 300; width: 100%; display: block; text-align: center;}
             .card-footer { display: flex; justify-content: space-between; align-items: flex-end; }
             .location { display: flex; align-items: center; gap: 15px; font-size: 2.5rem; }
             .university-logo img { width: 225px; height: auto; margin: -55px -15px;}
-            .insta-card::after { content: ""; position: absolute; top: 20px; bottom: 20px; left: 20px; right: 20px; border: 5px solid rgba(255,255,255,0.4); border-radius: 10px 10px 120px 10px; }
+            .insta-card::after { content: ""; position: absolute; top: 20px; bottom: 20px; left: 20px; right: 20px; border: 5px solid rgba(255,255,255,0.4); border-radius: 10px 10px 120px 10px; z-index: 1; pointer-events: none;}
         </style>
     </head>
     <body>
         <div class="insta-card">
-            <header class="card-header">
+            <img src="{{ bg_image_data }}" class="bg-img"> <header class="card-header">
                 <div class="name-block"><h1>{{ name }}</h1></div>
                 <div class="handle">{{ handle }}</div>
             </header>
@@ -103,10 +113,9 @@
             </div>
             <footer class="card-footer">
                 <div class="location">
-                    <svg viewBox="0 0 24 24" fill="currentColor" width="40" height="40">
-                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                </svg>
-                 {{ location }}</div>
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="40" height="40"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                    {{ location }}
+                </div>
                 <div class="university-logo"><img src="{{ seal_image_data }}"></div>
             </footer>
         </div>
