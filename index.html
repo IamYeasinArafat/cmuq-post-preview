@@ -85,8 +85,8 @@
             .major { margin-top: 15px; font-family: "Open Sans"; font-size: 2.5rem; font-weight: 300; }
             .card-footer { display: flex; justify-content: space-between; align-items: flex-end; }
             .location { display: flex; align-items: center; gap: 15px; font-size: 2.5rem; }
-            .university-logo img { width: 225px; height: auto; }
-            .insta-card::after { content: ""; position: absolute; top: 20px; bottom: 20px; left: 20px; right: 20px; border: 5px solid rgba(255,255,255,0.4); border-radius: 10px; }
+            .university-logo img { width: 225px; height: auto; margin: -55px -15px;}
+            .insta-card::after { content: ""; position: absolute; top: 20px; bottom: 20px; left: 20px; right: 20px; border: 5px solid rgba(255,255,255,0.4); border-radius: 10px 10px 120px 10px; }
         </style>
     </head>
     <body>
@@ -100,7 +100,11 @@
                 <p class="major">{{ major }}</p>
             </div>
             <footer class="card-footer">
-                <div class="location">📍 {{ location }}</div>
+                <div class="location">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="40" height="40">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+                 {{ location }}</div>
                 <div class="university-logo"><img src="{{ seal_image_data }}"></div>
             </footer>
         </div>
