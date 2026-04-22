@@ -6,7 +6,7 @@
     <title>Instagram Template Previewer</title>
     
     <link rel="stylesheet" href="style.css">
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nunjucks/3.0.1/nunjucks.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;600&family=Open+Sans:wght@300&family=Inter:wght@400;700&display=swap" rel="stylesheet">
 </head>
@@ -35,6 +35,8 @@
             <label>Profile Portrait</label>
             <label class="file-btn" for="prof_up">Upload Photo</label>
             <input type="file" id="prof_up" accept="image/*">
+
+            <button id="download-btn" class="download-btn">Download as JPG</button>
         </div>
     </div>
 
@@ -78,8 +80,8 @@
                 position: relative; overflow: hidden;
             }
             .card-header { display: flex; justify-content: space-between; align-items: center;}
-            .name-block { font-size: 2.75rem; overflow: hidden;font-weight: 600; width: 60%; border: 1px solid rgba(255,255,255,0.15); padding: 15px; }
-            .handle { font-size: 2.5rem; text-align: end; width: 40%; border: 1px solid rgba(255,255,255,0.15); padding: 15px; }
+            .name-block { font-size: 2.75rem; overflow: hidden;font-weight: 600; width: 60%; border: 0px solid rgba(255,255,255,0.15); padding: 15px; }
+            .handle { font-size: 2.5rem; text-align: end; width: 40%; border: 0px solid rgba(255,255,255,0.15); padding: 15px; }
             .image-container { display: flex; flex-direction: column; align-items: center; flex-grow: 1; justify-content: center; }
             .image-container img { width: 650px; height: 650px; object-fit: cover; border-radius: 24px; border: 5px solid white; }
             .major { margin-top: 15px; font-family: "Open Sans"; font-size: 2.5rem; font-weight: 300; }

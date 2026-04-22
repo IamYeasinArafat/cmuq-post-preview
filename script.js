@@ -64,4 +64,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initial Run
     updatePreview();
+
+    document.getElementById('download-btn').addEventListener('click', downloadImage);
 });
+
+
+function downloadImage() {
+    const iframe = document.getElementById('preview-frame');
+    const cardElement = iframe.contentDocument.querySelector('.insta-card');
+
+    // Use html2canvas to render the specific element
+    html2canvas(cardElement, {
+        allowTaint: true,
+        useCORS: true,
+        width: 1080, // Match your card width
+        height: 1440 // Match your card height
+    }).then(canvas => {
+        // Convert to data URL and trigger download
+        const image = canvas.toDataURL("image/jpeg", 1.0);
+        const link = document.createElement('a');
+        link.download = 'instagram-card.jpg';
+        link.href = image;
+        link.click();
+    });
+}
